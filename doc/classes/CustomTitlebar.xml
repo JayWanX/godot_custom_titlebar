@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="CustomTitlebar" inherits="Object" api_type="core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../class.xsd">
+	<brief_description>
+		自定义标题栏：让窗口保用系统原生边框（拖动、缩放、贴边分屏、圆角、阴影全部由系统提供），
+		但把标题栏区域并入客户区，由 GDScript 在客户区顶部自绘。
+	</brief_description>
+	<description>
+		**不动窗口样式，只改客户区计算**：接管 `WM_NCCALCSIZE` 把客户区扩到整个窗口矩形，
+		系统就不再绘制标题栏，而 `WS_THICKFRAME` 仍归系统所有——因此缩放边框、Aero Snap、
+		双击最大化、最小化/最大化动画全部保持原生行为，不经 GDScript 逐帧算坐标。
+		**样式必须保持原样**：引擎的 `_update_window_style()` 会在切换窗口模式时按
+		`WS_OVERLAPPEDWINDOW` 整块重写 `GWL_STYLE`，改过的样式会被覆盖回去。
+		仅在 Windows 上可用。
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_interactive_rects" qualifiers="const">
+			<return type="Array" />
+			<description>
+				取标题栏内的交互区域。
+			</description>
+		</method>
+		<method name="install">
+			<return type="bool" />
+			<description>
+				安装：替换窗口过程并把标题栏并入客户区。
+				返回 false 表示系统不支持或取不到窗口句柄。
+			</description>
+		</method>
+		<method name="is_installed" qualifiers="const">
+			<return type="bool" />
+			<description>
+				当前是否已安装。
+			</description>
+		</method>
+		<method name="is_maximized" qualifiers="const">
+			<return type="bool" />
+			<description>
+				窗口当前是否处于最大化。
+			</description>
+		</method>
+		<method name="is_supported" qualifiers="const">
+			<return type="bool" />
+			<description>
+				当前平台是否支持自定义标题栏。
+			</description>
+		</method>
+		<method name="set_border_color">
+			<return type="void" />
+			<param index="0" name="color" type="Color" />
+			<description>
+				设置窗口边框色。
+				[param color] 边框颜色；alpha 为 0 表示沿用系统默认。
+			</description>
+		</method>
+		<method name="set_dark_appearance">
+			<return type="void" />
+			<param index="0" name="dark" type="bool" />
+			<description>
+				设置窗口深浅色外观，影响系统绘制的边框、阴影与右键菜单配色。
+				[param dark] 为 true 使用深色外观。
+			</description>
+		</method>
+		<method name="set_interactive_rects">
+			<return type="void" />
+			<param index="0" name="rects" type="Array" />
+			<description>
+				设置标题栏内需要接收鼠标的区域（按钮等）。
+				落在这些矩形内的位置不会报成标题栏，点击才会交给界面控件。
+				[param rects] 矩形数组，客户区坐标。
+			</description>
+		</method>
+		<method name="set_rounded_corners">
+			<return type="void" />
+			<param index="0" name="rounded" type="bool" />
+			<description>
+				设置窗口圆角。
+				[param rounded] 为 true 使用系统圆角，false 使用直角。
+			</description>
+		</method>
+		<method name="uninstall">
+			<return type="void" />
+			<description>
+				卸载：恢复原生标题栏与原始窗口过程。
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="border_thickness" type="float" setter="set_border_thickness" getter="get_border_thickness" default="8.0">
+			客户区顶部留给缩放边框的高度，避免顶边无法拖拽调整大小。
+		</member>
+		<member name="caption_height" type="float" setter="set_caption_height" getter="get_caption_height" default="0.0">
+			标题栏高度，客户区坐标下的像素值。
+		</member>
+	</members>
+</class>
