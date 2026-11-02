@@ -21,11 +21,11 @@
 #ifndef DWMWA_USE_IMMERSIVE_DARK_MODE
 #define DWMWA_USE_IMMERSIVE_DARK_MODE 20
 #endif
-#ifndef DWMWCP_DEFAULT
-#define DWMWCP_DEFAULT 0
-#endif
 #ifndef DWMWCP_DONOTROUND
 #define DWMWCP_DONOTROUND 1
+#endif
+#ifndef DWMWCP_ROUND
+#define DWMWCP_ROUND 2
 #endif
 // 表示「沿用系统配色」的哨兵值。
 #ifndef DWMWA_COLOR_DEFAULT
@@ -370,7 +370,12 @@ void CustomTitlebar::set_rounded_corners(bool p_rounded) {
 	if (window_handle == nullptr) {
 		return;
 	}
-	DWORD l_preference = p_rounded ? DWMWCP_DEFAULT : DWMWCP_DONOTROUND;
+	// **必须用显式的 DWMWCP_ROUND，不能用 DWMWCP_DEFAULT**：
+	// DEFAULT 是「系统按边框自行决定」，而本模块已把标题栏并入客户区，
+	// 帧重算（install 的 SWP_FRAMECHANGED、首次尺寸变化）后系统会判定
+	// 窗口无标准边框可圆——表现为启动瞬间有圆角、随后消失。
+	// 偏好一经显式设置即持久，最大化/还原不会清除。
+	DWORD l_preference = p_rounded ? DWMWCP_ROUND : DWMWCP_DONOTROUND;
 	DwmSetWindowAttribute((HWND)window_handle, DWMWA_WINDOW_CORNER_PREFERENCE,
 			&l_preference, sizeof(l_preference));
 }

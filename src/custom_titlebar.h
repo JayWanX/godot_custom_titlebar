@@ -108,7 +108,8 @@ public:
 	void set_border_color(const Color &p_color);
 
 	/// 设置窗口圆角。
-	/// [param rounded] 为 true 使用系统圆角，false 使用直角。
+	/// [param rounded] 为 true 显式指定圆角（DWMWCP_ROUND）。**不要用 DEFAULT**：
+	/// 标题栏并入客户区后系统会判定无标准边框可圆，表现为启动后圆角消失。
 	void set_rounded_corners(bool p_rounded);
 
 	/// 设置窗口深浅色外观，影响系统绘制的边框、阴影与右键菜单配色。
